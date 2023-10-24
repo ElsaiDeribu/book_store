@@ -1,0 +1,31 @@
+version: '3'
+services:
+  backend:
+
+    build: back_end/
+    image: python:3.8-alpine
+    container_name: fastapi-backend
+    volumes:
+      - ./bookstoreBE:/app
+    ports:
+      - "8000:8000"
+    # command: sh -c "pip install uvicorn && uvicorn main:app --reload"
+    depends_on:
+      - sqlite-db
+    environment:
+      - DATABASE_URL=sqlite:///./bookstoreBE/mydatabase.db  # SQLite database URL
+
+  sqlite-db:
+    image: busybox
+    volumes:
+      - ./bookstoreBE/mydatabase.db:/mydatabase.db
+    command: echo "SQLite database volume"
+
+  frontend:
+    build: front_end/
+    image: nginx:latest
+    container_name: frontend
+    volumes:
+      - ./bookstoreFE:/usr/share/nginx/html
+    ports:
+      - "3000:3000"
