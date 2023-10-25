@@ -1,13 +1,9 @@
 "use client";
 import axios from "axios";
 import { useEffect, useState } from "react";
-
-interface Book {
-  id: number;
-  title: string;
-  author: string;
-  status: string;
-}
+import BookSection from "./BookSection";
+import AddBookForm from "./AddBookForm";
+import { Container } from "postcss";
 
 export default function BookStore() {
   const [books, setBooks] = useState<Book[]>([]);
@@ -116,42 +112,54 @@ export default function BookStore() {
 
   return (
     <div>
-      <main className="flex  flex-col md:h-screen bg-white justify-center items-center text-very-light-gray w-screen">
-        <div className="container  h-screen">
-          <div className="bg-black  h-[5vh] flex items-center justify-center backdrop-blur bg-opacity-50">
-            <div className="flex items-center text-black space-x-2">
-              <input
-                type="text"
-                placeholder="Title"
-                value={newBook.title}
-                onChange={(e) =>
-                  setNewBook({ ...newBook, title: e.target.value })
-                }
-              />
-              <input
-                type="text"
-                placeholder="Author"
-                value={newBook.author}
-                onChange={(e) =>
-                  setNewBook({ ...newBook, author: e.target.value })
-                }
-              />
+      <main className="flex flex-col bg-black justify-center items-center text-very-light-gray ">
+        <div className="container">
+          <div className="bg-gray-300 p-5 flex items-center justify-between backdrop-blur bg-opacity-50">
+            <div className="flex items-end text-black space-x-2">
+              <div className="flex flex-col items-between">
+                <input
+                  className=" text-gray-900 mb-2 text-sm rounded-lg block w-full p-2.5 "
+                  type="text"
+                  placeholder="Title"
+                  value={newBook.title}
+                  onChange={(e) =>
+                    setNewBook({ ...newBook, title: e.target.value })
+                  }
+                />
+                <input
+                  className=" text-gray-900 text-sm rounded-lg block w-full p-2.5 "
+                  type="text"
+                  placeholder="Author"
+                  value={newBook.author}
+                  onChange={(e) =>
+                    setNewBook({ ...newBook, author: e.target.value })
+                  }
+                />
+              </div>
+
               <button
-                className="rounded-3xl px-2 py- text-[15px] text-very-dark-cyan font-lexend-deca hover:bg-very-dark-cyan hover:text-very-light-gray border-2"
+                className="text-white bg-blue-500 focus:outline-none focus:ring-4 font-medium rounded-full text-sm px-5 py-2.5 text-center mr-2 mb-2 "
                 onClick={handleAddBook}
               >
                 Add Book
               </button>
             </div>
+            <div className="text-2xl pr-56">
             <h1>The Book Store</h1>
+
+            </div>
+
+            <div></div>
           </div>
-          <div className="grid grid-cols md:grid-cols-3 md:h-[95vh]">
+          <div className=" container grid grid-cols md:grid-cols-3 md:h-[95vh]">
             <BookSection
               title="To Read"
               books={books.filter((book) => book.status === "To Read")}
               onMoveBook={handleMoveBook}
               onTakeBackBook={handleTakeBackBook}
               onDeleteBook={handleDeleteBook}
+              getNextStatus={getNextStatus}
+              getPreviousStatus={getPreviousStatus}
             />
             <BookSection
               title="In Progress"
@@ -159,6 +167,8 @@ export default function BookStore() {
               onMoveBook={handleMoveBook}
               onTakeBackBook={handleTakeBackBook}
               onDeleteBook={handleDeleteBook}
+              getPreviousStatus={getPreviousStatus}
+              getNextStatus={getNextStatus}
             />
             <BookSection
               title="Completed"
@@ -166,60 +176,12 @@ export default function BookStore() {
               onMoveBook={handleMoveBook}
               onTakeBackBook={handleTakeBackBook}
               onDeleteBook={handleDeleteBook}
+              getPreviousStatus={getPreviousStatus}
+              getNextStatus={getNextStatus}
             />
           </div>
         </div>
       </main>
     </div>
-  );
-}
-
-interface BookSectionProps {
-  title: string;
-  books: Book[];
-  onMoveBook: (bookId: number) => void;
-  onTakeBackBook: (bookId: number) => void;
-  onDeleteBook: (bookId: number) => void;
-}
-
-function BookSection({
-  title,
-  books,
-  onMoveBook,
-  onTakeBackBook,
-  onDeleteBook,
-}: BookSectionProps) {
-  return (
-    <section className="p-12 bg-red-300 text-black space-y-8 flex flex-col justify-between flex-1">
-      <div className="text-stone-950 text-xl font-bold">
-        <h1>{title}</h1>
-      </div>
-      {books.map((book) => (
-        <div key={book.id} className="bg-white p-2 rounded-lg shadow-md">
-          <div>
-            <strong>Title:</strong> {book.title}
-          </div>
-          <div>
-            <strong>Author:</strong> {book.author}
-          </div>
-          <div>
-            <strong>Status:</strong> {book.status}
-          </div>
-          <button
-            onClick={() => onMoveBook(book.id)}
-            disabled={book.status === "Completed"}
-          >
-            Move
-          </button>
-          <button
-            onClick={() => onTakeBackBook(book.id)}
-            disabled={book.status === "To Read"}
-          >
-            Take Back
-          </button>
-          <button onClick={() => onDeleteBook(book.id)}>Delete</button>
-        </div>
-      ))}
-    </section>
   );
 }
