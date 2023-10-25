@@ -12,9 +12,11 @@ def get_test_db():
         CREATE TABLE IF NOT EXISTS books (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             title TEXT NOT NULL,
+            author TEXT,
             status TEXT NOT NULL
         )
     """)
+    
     connection.commit()
     return connection
 
@@ -24,7 +26,8 @@ def test_create_book():
     # Define a sample book data
     book_data = {
         "title": "Test Book",
-        "status": "Available"
+        "status": "Available",
+        "author": "Test Author"
     }
     
     # Use the test database connection
@@ -41,5 +44,6 @@ def test_create_book():
     created_book = response.json()
     assert created_book["title"] == book_data["title"]
     assert created_book["status"] == book_data["status"]
+    assert created_book["author"] == book_data["author"]
     
     # Cleanup: No need to delete the book in an in-memory database
