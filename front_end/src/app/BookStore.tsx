@@ -2,8 +2,8 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
 import BookSection from "./BookSection";
-import AddBookForm from "./AddBookForm";
-import { Container } from "postcss";
+import { Alert } from "@mui/material";
+import { Snackbar } from "@mui/material";
 
 export default function BookStore() {
   const [books, setBooks] = useState<Book[]>([]);
@@ -17,6 +17,9 @@ export default function BookStore() {
     status: "To Read",
   });
 
+  const [error, setError] = useState<string>("");
+  const [openSnackbar, setOpenSnackbar] = useState<boolean>(false);
+
   useEffect(() => {
     const getBooks = async () => {
       try {
@@ -24,8 +27,9 @@ export default function BookStore() {
           "http://127.0.0.1:8000/books"
         );
         setBooks(booksFromServer.data);
-      } catch (err) {
-        console.log(err);
+      } catch (err: any) {
+        setError(err.message);
+        setOpenSnackbar(true);
       }
     };
 
@@ -40,8 +44,9 @@ export default function BookStore() {
       );
       setBooks([...books, response.data]);
       setNewBook({ title: "", author: "", status: "To Read" });
-    } catch (err) {
-      console.log(err);
+    } catch (err: any) {
+      setError(err.message);
+      setOpenSnackbar(true);
     }
   };
 
@@ -65,8 +70,9 @@ export default function BookStore() {
         book.id === bookId ? { ...book, status: newStatus } : book
       );
       setBooks(updatedBooks);
-    } catch (err) {
-      console.log(err);
+    } catch (err: any) {
+      setError(err.message);
+      setOpenSnackbar(true);
     }
   };
 
@@ -75,8 +81,9 @@ export default function BookStore() {
       await axios.delete(`http://127.0.0.1:8000/books/${bookId}`);
       const updatedBooks = books.filter((book) => book.id !== bookId);
       setBooks(updatedBooks);
-    } catch (err) {
-      console.log(err);
+    } catch (err: any) {
+      setError(err.message);
+      setOpenSnackbar(true);
     }
   };
 
@@ -110,8 +117,21 @@ export default function BookStore() {
     return "To Read";
   };
 
+  const handleClose = () => {
+    setOpenSnackbar(false);
+  };
+
   return (
     <div>
+      <Snackbar
+        open={openSnackbar}
+        autoHideDuration={6000}
+        onClose={handleClose}
+      >
+        <Alert onClose={handleClose} severity="error" sx={{ width: "100%" }}>
+          {error}
+        </Alert>
+      </Snackbar>
       <main className="flex flex-col bg-black justify-center items-center text-very-light-gray ">
         <div className="container">
           <div className="bg-gray-300 p-5 flex items-center justify-between backdrop-blur bg-opacity-50">
@@ -145,41 +165,45 @@ export default function BookStore() {
               </button>
             </div>
             <div className="text-2xl pr-56">
-            <h1>The Book Store</h1>
-
+              <h1>The Book Store</h1>
             </div>
 
             <div></div>
           </div>
-          <div className=" container grid grid-cols md:grid-cols-3 md:h-[95vh]">
-            <BookSection
-              title="To Read"
-              books={books.filter((book) => book.status === "To Read")}
-              onMoveBook={handleMoveBook}
-              onTakeBackBook={handleTakeBackBook}
-              onDeleteBook={handleDeleteBook}
-              getNextStatus={getNextStatus}
-              getPreviousStatus={getPreviousStatus}
-            />
-            <BookSection
-              title="In Progress"
-              books={books.filter((book) => book.status === "In Progress")}
-              onMoveBook={handleMoveBook}
-              onTakeBackBook={handleTakeBackBook}
-              onDeleteBook={handleDeleteBook}
-              getPreviousStatus={getPreviousStatus}
-              getNextStatus={getNextStatus}
-            />
-            <BookSection
-              title="Completed"
-              books={books.filter((book) => book.status === "Completed")}
-              onMoveBook={handleMoveBook}
-              onTakeBackBook={handleTakeBackBook}
-              onDeleteBook={handleDeleteBook}
-              getPreviousStatus={getPreviousStatus}
-              getNextStatus={getNextStatus}
-            />
-          </div>
+
+          {error ? (
+            <div className="text-red-500">{error}</div>
+          ) : (
+            <div className=" container grid grid-cols md:grid-cols-3 md:h-[95vh]">
+              <BookSection
+                title="To Read"
+                books={books.filter((book) => book.status === "To Read")}
+                onMoveBook={handleMoveBook}
+                onTakeBackBook={handleTakeBackBook}
+                onDeleteBook={handleDeleteBook}
+                getNextStatus={getNextStatus}
+                getPreviousStatus={getPreviousStatus}
+              />
+              <BookSection
+                title="In Progress"
+                books={books.filter((book) => book.status === "In Progress")}
+                onMoveBook={handleMoveBook}
+                onTakeBackBook={handleTakeBackBook}
+                onDeleteBook={handleDeleteBook}
+                getPreviousStatus={getPreviousStatus}
+                getNextStatus={getNextStatus}
+              />
+              <BookSection
+                title="Completed"
+                books={books.filter((book) => book.status === "Completed")}
+                onMoveBook={handleMoveBook}
+                onTakeBackBook={handleTakeBackBook}
+                onDeleteBook={handleDeleteBook}
+                getPreviousStatus={getPreviousStatus}
+                getNextStatus={getNextStatus}
+              />
+            </div>
+          )}
         </div>
       </main>
     </div>

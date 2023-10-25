@@ -21,7 +21,7 @@ export default function BookSection({
   getNextStatus,
 }: BookSectionProps) {
   return (
-    <section className="p-12 bg-blue-200 border border-xl text-black space-y-8 flex flex-col justify-start">
+    <section className="p-12 bg-blue-200 border border-2 border-blue-500 text-black space-y-8 flex flex-col justify-start">
       <div className="text-stone-950 text-xl font-bold">
         <h1>{title}</h1>
       </div>
